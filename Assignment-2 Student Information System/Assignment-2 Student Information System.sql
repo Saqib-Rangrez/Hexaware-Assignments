@@ -2,6 +2,7 @@
 CREATE DATABASE SISDB;
 USE SISDB;
 
+
 CREATE TABLE Students (
     student_id INT PRIMARY KEY,
     first_name VARCHAR(50),

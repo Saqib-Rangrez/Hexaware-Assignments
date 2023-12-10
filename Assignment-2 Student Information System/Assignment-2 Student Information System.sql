@@ -114,22 +114,28 @@ INSERT INTO Payments VALUES
 INSERT INTO Students (student_id, first_name, last_name, date_of_birth, email, phone_number)
 VALUES (11, 'John', 'Doe', '1995-08-15', 'john.doe@example.com', '1234567890');
 
+
 INSERT INTO Enrollments (enrollment_id, student_id, course_id, enrollment_date)
 VALUES (13,7, 109, '2023-12-10');
+
 
 UPDATE Teacher
 SET email = 'new.email@example.com'
 WHERE teacher_id = 1;
 
+
 DELETE FROM Enrollments
 WHERE student_id = 1 AND course_id = 101;
+
 
 UPDATE Courses
 SET teacher_id = 2
 WHERE course_id = 105;
 
+
 DELETE FROM Students
 WHERE student_id = 4;  --All the enrollments records will automatically be deleted because we're using ON DELETE CASCADE in enrollments table
+
 
 UPDATE Payments
 SET amount = 1500.00
@@ -144,43 +150,52 @@ FROM Students s
 INNER JOIN Payments p ON s.student_id = p.student_id
 GROUP BY s.student_id, s.first_name, s.last_name;
 
+
 SELECT c.course_id, c.course_name, COUNT(e.student_id) AS enrolled_students_count
 FROM Courses c
 LEFT JOIN Enrollments e ON c.course_id = e.course_id
 GROUP BY c.course_id, c.course_name;
+
 
 SELECT s.first_name, s.last_name
 FROM Students s
 LEFT JOIN Enrollments e ON s.student_id = e.student_id
 WHERE e.enrollment_id IS NULL;
 
+
 SELECT s.first_name, s.last_name, c.course_name
 FROM Students s
 JOIN Enrollments e ON s.student_id = e.student_id
 JOIN Courses c ON e.course_id = c.course_id;
 
+
 SELECT t.first_name, t.last_name, c.course_name
 FROM Teacher t
 JOIN Courses c ON t.teacher_id = c.teacher_id;
 
+
 SELECT s.first_name, s.last_name, e.enrollment_date
 FROM Students s
 JOIN Enrollments e ON s.student_id = e.student_id;
+
 
 SELECT s.first_name, s.last_name
 FROM Students s
 LEFT JOIN Payments p ON s.student_id = p.student_id
 WHERE p.payment_id IS NULL;
 
+
 SELECT c.course_id, c.course_name
 FROM Courses c
 LEFT JOIN Enrollments e ON c.course_id = e.course_id
 WHERE e.enrollment_id IS NULL;
 
+
 SELECT e1.student_id, count(e1.student_id) AS no_of_enrollments
 FROM Enrollments e1
 JOIN Enrollments e2 ON e1.student_id = e2.student_id AND e1.enrollment_id <> e2.enrollment_id
 GROUP BY e1.student_id HAVING COUNT(DISTINCT e2.course_id) > 1;
+
 
 SELECT t.teacher_id, t.first_name, t.last_name
 FROM Teacher t
@@ -199,6 +214,7 @@ FROM (
 ) AS course_enrollment_counts
 GROUP BY course_id;
 
+
 SELECT student_id, first_name, last_name
 FROM Students
 WHERE student_id = (
@@ -206,6 +222,7 @@ WHERE student_id = (
     FROM Payments
     ORDER BY amount DESC
 );
+
 
 --Fetches top 5 courses with maximun enrollments
 SELECT TOP 5 course_id, course_name, enrollment_count
@@ -216,6 +233,7 @@ FROM (
     GROUP BY C.course_id, C.course_name
 ) AS course_enrollment_counts
 ORDER BY enrollment_count DESC;
+
 
 SELECT teacher_id, SUM(amount) AS total_payments
 FROM (
@@ -237,11 +255,13 @@ WHERE (SELECT COUNT(DISTINCT course_id) FROM Courses) = (
     WHERE Students.student_id = Enrollments.student_id
 );
 
+
 SELECT teacher_id, first_name, last_name
 FROM Teacher
 WHERE teacher_id NOT IN (
     SELECT DISTINCT teacher_id FROM Courses
 );
+
 
 SELECT AVG(age) AS average_age
 FROM (
@@ -249,17 +269,20 @@ FROM (
     FROM Students
 ) AS student_age;
 
+
 SELECT course_id, course_name
 FROM Courses
 WHERE course_id NOT IN (
     SELECT DISTINCT course_id FROM Enrollments
 );
 
+
 SELECT E.student_id, E.course_id, ISNULL(SUM(P.amount), 0) AS total_payments
 FROM Enrollments E
 LEFT JOIN Payments P ON E.student_id = P.student_id
 WHERE E.student_id IN (SELECT DISTINCT student_id FROM Enrollments)
 GROUP BY E.student_id, E.course_id;
+
 
 SELECT student_id, first_name, last_name
 FROM Students
@@ -270,15 +293,18 @@ WHERE student_id IN (
     HAVING COUNT(payment_id) > 1
 );
 
+
 SELECT S.student_id, S.first_name, S.last_name, SUM(P.amount) AS total_payments
 FROM Students S
 LEFT JOIN Payments P ON S.student_id = P.student_id
 GROUP BY S.student_id, S.first_name, S.last_name;
 
+
 SELECT C.course_id, C.course_name, COUNT(E.student_id) AS enrolled_students_count
 FROM Courses C
 LEFT JOIN Enrollments E ON C.course_id = E.course_id
 GROUP BY C.course_id, C.course_name;
+
 
 SELECT AVG(P.amount) AS average_payment_amount
 FROM Payments P

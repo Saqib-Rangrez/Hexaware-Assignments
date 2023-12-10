@@ -1,17 +1,15 @@
-
+--Task-1
 CREATE DATABASE TicketBookingSystem;
-
 USE TicketBookingSystem;
 
 
--- Create Venu Table
 CREATE TABLE Venu (
     venue_id INT PRIMARY KEY,
     venue_name VARCHAR(255),
     address VARCHAR(255)
 );
 
--- Create Event Table
+
 CREATE TABLE Event (
     event_id INT PRIMARY KEY,
     event_name VARCHAR(255),
@@ -25,7 +23,7 @@ CREATE TABLE Event (
     booking_id INT
 );
 
--- Create Booking Table
+
 CREATE TABLE Booking (
     booking_id INT PRIMARY KEY,
     customer_id INT,
@@ -35,7 +33,7 @@ CREATE TABLE Booking (
     booking_date DATE
 );
 
--- Create Customer Table
+
 CREATE TABLE Customer (
     customer_id INT PRIMARY KEY,
     customer_name VARCHAR(255),
@@ -45,7 +43,7 @@ CREATE TABLE Customer (
 );
 
 
--- Add Foreign Key Constraints using ALTER TABLE
+-- Add Foreign Key Constraints using ALTER TABLE for Refrential Integerity
 ALTER TABLE Customer
 ADD FOREIGN KEY (booking_id) REFERENCES Booking(booking_id);
 
@@ -62,8 +60,6 @@ ALTER TABLE Event
 ADD CHECK (event_type IN ('Movie', 'Sports', 'Concert'));
 
 
-
--- Insert sample records into Venu Table
 INSERT INTO Venu (venue_id, venue_name, address) VALUES
 (1, 'Grand Theater', '123 Main Street, Cityville'),
 (2, 'City Arena', '456 Center Avenue, Townsville'),
@@ -76,7 +72,7 @@ INSERT INTO Venu (venue_id, venue_name, address) VALUES
 (9, 'Soccer Park', '606 Goal Street, Kicksville'),
 (10, 'Music Dome', '707 Harmony Road, Concertburg');
 
--- Insert sample records into Event Table
+
 INSERT INTO Event (event_id, event_name, event_date, event_time, venue_id, total_seats, available_seats, ticket_price, event_type, booking_id) VALUES
 (1, 'Movie Night: Inception', '2023-01-15', '18:00:00', 1, 150, 120, 2220.00, 'Movie', NULL),
 (2, 'Concert: Acoustic Vibes', '2023-02-20', '20:00:00', 2, 300, 250, 1235.00, 'Concert', NULL),
@@ -89,7 +85,7 @@ INSERT INTO Event (event_id, event_name, event_date, event_time, venue_id, total
 (9, 'Soccer Match: International Clash', '2023-09-18', '19:45:00', 9, 200, 180, 1225.00, 'Sports', NULL),
 (10, 'Concert: Rock Revolution', '2023-10-30', '22:00:00', 10, 250, 200, 3310.00, 'Concert', NULL);
 
--- Insert sample records into Customer Table
+
 INSERT INTO Customer (customer_id, customer_name, email, phone_number, booking_id) VALUES
 (1, 'John Doe', 'john.doe@email.com', '555-1234', NULL),
 (2, 'Jane Smith', 'jane.smith@email.com', '555-5678', NULL),
@@ -102,7 +98,7 @@ INSERT INTO Customer (customer_id, customer_name, email, phone_number, booking_i
 (9, 'Daniel Wilson', 'daniel.w@email.com', '555-5678', NULL),
 (10, 'Sophia Adams', 'sophia.a@email.com', '555-9012', NULL);
 
--- Insert sample records into Booking Table
+
 INSERT INTO Booking (booking_id, customer_id, event_id, num_tickets, total_cost, booking_date) VALUES
 (1, 1, 1, 2, 4440.00, '2023-01-15'),
 (2, 2, 2, 3, 3705.00, '2023-02-20'),
@@ -115,7 +111,7 @@ INSERT INTO Booking (booking_id, customer_id, event_id, num_tickets, total_cost,
 (9, 9, 9, 2, 2450.00, '2023-09-18'),
 (10, 10, 10, 3, 9930.00, '2023-10-30');
 
--- Update Booking Table with correct booking_id values
+
 UPDATE Event SET booking_id = 1 WHERE event_id = 1;
 UPDATE Event SET booking_id = 2 WHERE event_id = 2;
 UPDATE Event SET booking_id = 3 WHERE event_id = 3;
@@ -127,7 +123,7 @@ UPDATE Event SET booking_id = 8 WHERE event_id = 8;
 UPDATE Event SET booking_id = 9 WHERE event_id = 9;
 UPDATE Event SET booking_id = 10 WHERE event_id = 10;
 
--- Update Customer Table with correct booking_id values
+
 UPDATE Customer SET booking_id = 1 WHERE customer_id = 1;
 UPDATE Customer SET booking_id = 2 WHERE customer_id = 2;
 UPDATE Customer SET booking_id = 3 WHERE customer_id = 3;
@@ -139,6 +135,8 @@ UPDATE Customer SET booking_id = 8 WHERE customer_id = 8;
 UPDATE Customer SET booking_id = 9 WHERE customer_id = 9;
 UPDATE Customer SET booking_id = 10 WHERE customer_id = 10;
 
+
+--Task-2
 
 SELECT * FROM Event;
 
@@ -163,41 +161,54 @@ SELECT * FROM Event WHERE total_seats > 15000 ORDER BY total_seats;
 SELECT * FROM Event WHERE NOT event_name LIKE '[x-z]%';
 
 
+--Task-3
+
+
 SELECT event_name, AVG(ticket_price) AS average_ticket_price
 FROM Event GROUP BY event_name;
 
+
 SELECT SUM(total_cost) AS total_revenue FROM Booking;
+
 
 SELECT TOP 1 event_id, SUM(num_tickets) AS total_tickets_sold FROM Booking
 GROUP BY event_id ORDER BY total_tickets_sold DESC;
 
+
 SELECT event_id, SUM(num_tickets) AS total_tickets_sold
 FROM Booking GROUP BY event_id;
 
+
 SELECT event_id, event_name FROM Event
 WHERE event_id NOT IN (SELECT DISTINCT event_id FROM Booking);
+
 
 SELECT TOP 1 c.customer_id, c.customer_name, COUNT(b.booking_id) AS total_tickets_booked
 FROM Customer c JOIN Booking b ON c.customer_id = b.customer_id
 GROUP BY c.customer_id, c.customer_name
 ORDER BY total_tickets_booked DESC;
 
+
 SELECT MONTH(booking_date) AS month, event_id, SUM(num_tickets) AS total_tickets_sold
 FROM Booking GROUP BY MONTH(booking_date), event_id;
+
 
 SELECT v.venue_id, v.venue_name, AVG(e.ticket_price) AS average_ticket_price
 FROM Venu v
 JOIN Event e ON v.venue_id = e.venue_id
 GROUP BY v.venue_id, v.venue_name;
 
+
 SELECT event_type, SUM(num_tickets) AS total_tickets_sold
 FROM Event
 JOIN Booking ON Event.event_id = Booking.event_id
 GROUP BY event_type;
 
+
 SELECT YEAR(booking_date) AS year, SUM(total_cost) AS total_revenue
 FROM Booking
 GROUP BY YEAR(booking_date);
+
 
 SELECT c.customer_id, c.customer_name
 FROM Customer c
@@ -205,25 +216,33 @@ JOIN Booking b ON c.customer_id = b.customer_id
 GROUP BY c.customer_id, c.customer_name
 HAVING COUNT(DISTINCT b.event_id) > 1;
 
+
 SELECT c.customer_id, c.customer_name, SUM(total_cost) AS total_revenue
 FROM Customer c
 JOIN Booking b ON c.customer_id = b.customer_id
 GROUP BY c.customer_id, c.customer_name;
+
 
 SELECT v.venue_id, v.venue_name, e.event_type, AVG(e.ticket_price) AS average_ticket_price
 FROM Venu v
 JOIN Event e ON v.venue_id = e.venue_id
 GROUP BY v.venue_id, v.venue_name, e.event_type;
 
+
 INSERT INTO Booking (booking_id, customer_id, event_id, num_tickets, total_cost, booking_date) VALUES
 (11, 1, 1, 2, 4440.00, '2023-11-15'),
 (12, 2, 2, 3, 3705.00, '2023-12-20');
+
 
 SELECT c.customer_id, c.customer_name, COUNT(b.booking_id) AS total_tickets_purchased
 FROM Customer c
 JOIN Booking b ON c.customer_id = b.customer_id
 WHERE b.booking_date >= DATEADD(DAY, -30, GETDATE())
 GROUP BY c.customer_id, c.customer_name;
+
+
+
+--Task-4
 
 SELECT venue_id, venue_name, (
     SELECT AVG(ticket_price)
@@ -232,6 +251,7 @@ SELECT venue_id, venue_name, (
 ) AS average_ticket_price
 FROM Venu v;
 
+
 SELECT event_id, event_name FROM Event
 WHERE (
     SELECT SUM(num_tickets)
@@ -239,12 +259,14 @@ WHERE (
     WHERE Booking.event_id = Event.event_id
 ) > 0.5 * total_seats;
 
+
 SELECT event_id, event_name, (
     SELECT SUM(num_tickets)
     FROM Booking
     WHERE Booking.event_id = Event.event_id
 ) AS total_tickets_sold
 FROM Event;
+
 
 SELECT customer_id, customer_name
 FROM Customer c
@@ -254,12 +276,14 @@ WHERE NOT EXISTS (
     WHERE b.customer_id = c.customer_id
 );
 
+
 SELECT event_id, event_name
 FROM Event
 WHERE event_id NOT IN (
     SELECT DISTINCT event_id
     FROM Booking
 );
+
 
 SELECT event_type, SUM(total_tickets_sold) AS total_tickets_sold
 FROM (
@@ -272,6 +296,7 @@ FROM (
 ) AS Subquery
 GROUP BY event_type;
 
+
 SELECT event_id, event_name, ticket_price
 FROM Event
 WHERE ticket_price > (
@@ -279,12 +304,14 @@ WHERE ticket_price > (
     FROM Event
 );
 
+
 SELECT customer_id, customer_name, (
     SELECT SUM(total_cost)
     FROM Booking
     WHERE Booking.customer_id = c.customer_id
 ) AS total_revenue
 FROM Customer c;
+
 
 SELECT customer_id, customer_name
 FROM Customer
@@ -295,6 +322,7 @@ WHERE EXISTS (
     WHERE Event.venue_id = 1
     AND Booking.customer_id = Customer.customer_id
 );
+
 
 SELECT event_type, SUM(total_tickets_sold) AS total_tickets_sold
 FROM (
@@ -307,6 +335,7 @@ FROM (
 ) AS Subquery
 GROUP BY event_type;
 
+
 SELECT customer_id, customer_name
 FROM Customer c
 WHERE EXISTS (
@@ -315,6 +344,7 @@ WHERE EXISTS (
     WHERE b.customer_id = c.customer_id
     AND FORMAT(b.booking_date, 'yyyy-MM') = '2023-01'  -- Replace with the desired month
 );
+
 
 SELECT venue_id, venue_name, (
     SELECT AVG(ticket_price)

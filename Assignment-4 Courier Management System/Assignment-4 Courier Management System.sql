@@ -1,5 +1,6 @@
-CREATE DATABASE CourierManagementSystem;
+--Task-1
 
+CREATE DATABASE CourierManagementSystem;
 USE CourierManagementSystem;
 
 CREATE TABLE Users (
@@ -131,12 +132,12 @@ SELECT * FROM Couriers WHERE SenderName = (SELECT Name FROM Users WHERE UserID =
 
 SELECT * FROM Couriers;
 
-
 SELECT * FROM Payments WHERE CourierID = 3;
 
 SELECT * FROM Couriers WHERE Status != 'Delivered';
 
 SELECT * FROM Couriers WHERE DeliveryDate = '2023-04-01';
+
 SELECT * FROM Couriers WHERE Status = 'In Transit';
 
 SELECT CourierID, COUNT(*) AS TotalPackages
@@ -157,25 +158,32 @@ WHERE Payments.Amount > 20.0;
 
 SELECT * FROM Couriers 
 
+
+--Task-3
+
 SELECT e.Name AS EmployeeName, COUNT(c.CourierID) AS TotalCouriersHandled
 FROM Employees e
  JOIN Couriers c ON e.EmployeeID = c.CourierID
 GROUP BY e.Name;
+
 
 SELECT l.LocationName, SUM(p.Amount) AS TotalRevenue
 FROM Locations l
 LEFT JOIN Payments p ON l.LocationID = p.LocationID
 GROUP BY l.LocationName;
 
+
 SELECT l.LocationName, COUNT(c.CourierID) AS TotalCouriersDelivered
 FROM Locations l
 LEFT JOIN Couriers c ON l.LocationName = 'Kolkata'
 GROUP BY l.LocationName;
 
+
 SELECT c.CourierID, AVG(DATEDIFF(dd,c.DeliveryDate, '05-01-2023')) AS AvgDeliveryTime
 FROM Couriers c
 GROUP BY c.CourierID
 ORDER BY AvgDeliveryTime DESC;
+
 
 SELECT l.LocationName, SUM(p.Amount) AS TotalPayments
 FROM Locations l
@@ -183,10 +191,12 @@ LEFT JOIN Payments p ON l.LocationID = p.LocationID
 GROUP BY l.LocationName
 HAVING SUM(p.Amount) < 20;
 
+
 SELECT l.LocationName, SUM(p.Amount) AS TotalPayments
 FROM Locations l
 LEFT JOIN Payments p ON l.LocationID = p.LocationID
 GROUP BY l.LocationName;
+
 
 SELECT c.CourierID, c.ReceiverName, SUM(p.Amount) AS TotalPayments
 FROM Couriers c
@@ -195,12 +205,14 @@ WHERE p.LocationID = 5
 GROUP BY c.CourierID, c.ReceiverName
 HAVING SUM(p.Amount) > 10;
 
+
 SELECT c.CourierID, c.ReceiverName, SUM(p.Amount) AS TotalPayments
 FROM Couriers c
 JOIN Payments p ON c.CourierID = p.CourierID
 WHERE p.PaymentDate > '2023-04-01'
 GROUP BY c.CourierID, c.ReceiverName
 HAVING SUM(p.Amount) > 10;
+
 
 SELECT l.LocationName, SUM(p.Amount) AS TotalPayments
 FROM Locations l
@@ -210,105 +222,133 @@ GROUP BY l.LocationName
 HAVING SUM(p.Amount) > 20;
 
 
+
+--Task-4
+
 SELECT p.*, c.*
 FROM Payments p
 JOIN Couriers c ON p.CourierID = c.CourierID;
 
+
 SELECT p.*, l.*
 FROM Payments p
 JOIN Locations l ON p.LocationID = l.LocationID;
+
 
 SELECT p.*, c.*, l.*
 FROM Payments p
 JOIN Couriers c ON p.CourierID = c.CourierID
 JOIN Locations l ON p.LocationID = l.LocationID;
 
+
 SELECT p.*, c.*
 FROM Payments p
 LEFT JOIN Couriers c ON p.CourierID = c.CourierID;
+
 
 SELECT c.CourierID, c.ReceiverName, SUM(p.Amount) AS TotalPayments
 FROM Couriers c
 LEFT JOIN Payments p ON c.CourierID = p.CourierID
 GROUP BY c.CourierID, c.ReceiverName;
 
+
 SELECT * FROM Payments
 WHERE PaymentDate = '2023-03-25';
+
 
 SELECT p.*, c.*
 FROM Payments p
 LEFT JOIN Couriers c ON p.CourierID = c.CourierID;
+
 
 SELECT p.*, l.*
 FROM Payments p
 LEFT JOIN Locations l ON p.LocationID = l.LocationID;
 
+
 SELECT c.CourierID, c.ReceiverName, SUM(p.Amount) AS TotalPayments
 FROM Couriers c
 LEFT JOIN Payments p ON c.CourierID = p.CourierID
 GROUP BY c.CourierID, c.ReceiverName;
 
+
 SELECT * FROM Payments
 WHERE PaymentDate BETWEEN '2023-04-01' AND '2023-05-01';
+
 
 SELECT u.*, c.*
 FROM Users u JOIN Couriers c ON u.Name = c.SenderName OR u.Name=c.ReceiverName;
 
+
 SELECT c.*, cs.* FROM Couriers c
 FULL JOIN CourierServices cs ON c.CourierID = cs.ServiceID;
 
+
 SELECT e.*, p.* FROM Employees e
 CROSS JOIN Payments p;
+
 
 SELECT u.*, cs.*
 FROM Users u
 CROSS JOIN CourierServices cs;
 
+
 SELECT e.*, l.*
 FROM Employees e
 CROSS JOIN Locations l;
 
+
 SELECT c.*, u.Name AS SenderName, u.Address AS SenderAddress
 FROM Couriers c JOIN Users u ON u.Name = c.SenderName ;
 
+
 SELECT c.*, u.Name AS ReceiverName, u.Address AS ReceiverAddress
 FROM Couriers c JOIN Users u ON u.Name = c.ReceiverName;
+
 
 SELECT c.*, cs.*
 FROM Couriers c
 LEFT JOIN CourierServices cs ON c.CourierID = cs.ServiceID;
 
+
 SELECT e.*, COUNT(c.CourierID) AS TotalCouriersAssigned
 FROM Employees e JOIN Couriers c ON e.EmployeeID = c.CourierID
 GROUP BY e.EmployeeID;
+
 
 SELECT LocationName, SUM(p.Amount) AS TotalPayments
 FROM Locations l
 LEFT JOIN Payments p ON l.LocationID = p.LocationID
 GROUP BY l.LocationID;
 
+
 SELECT c.*, u.Name AS SenderName
 FROM Couriers c JOIN Users u ON u.Name = c.SenderName
 WHERE c.SenderName IS NOT NULL;
 
+
 SELECT e1.*, e2.* FROM Employees e1
 JOIN Employees e2 ON e1.Role = e2.Role AND e1.EmployeeID <> e2.EmployeeID;
+
 
 SELECT p.*, l.LocationName
 FROM Payments p
 LEFT JOIN Locations l ON p.LocationID = l.LocationID
 WHERE p.LocationID IS NOT NULL;
 
+
 SELECT c.*, l.LocationName AS SenderLocation
 FROM Couriers c
 LEFT JOIN Locations l ON c.CourierID = l.LocationID
 WHERE c.CourierID IS NOT NULL;
+
 
 SELECT e.*, COUNT(c.CourierID) AS TotalCouriersDelivered
 FROM Employees e
 LEFT JOIN Couriers c ON e.EmployeeID = c.CourierID
 WHERE c.Status = 'Delivered'
 GROUP BY e.EmployeeID;
+
 
 SELECT c.*, p.Amount, cs.Cost AS ServiceCost
 FROM Couriers c
@@ -317,19 +357,25 @@ LEFT JOIN CourierServices cs ON c.CourierID = cs.ServiceID
 WHERE p.Amount > cs.Cost;
 
 
+
+--Task-5
 SELECT * FROM Couriers
 WHERE Weight > (SELECT AVG(Weight) FROM Couriers);
 
+
 SELECT Name FROM Employees
 WHERE Salary > (SELECT AVG(Salary) FROM Employees);
+
 
 SELECT SUM(Cost) AS TotalCost
 FROM CourierServices
 WHERE Cost < (SELECT MAX(Cost) FROM CourierServices);
 
+
 SELECT c.*
 FROM Couriers c
 INNER JOIN Payments p ON c.CourierID = p.CourierID;
+
 
 SELECT l.LocationName FROM Locations l
 WHERE LocationID = (SELECT TOP 1 LocationID FROM Payments ORDER BY Amount DESC);
@@ -337,5 +383,3 @@ WHERE LocationID = (SELECT TOP 1 LocationID FROM Payments ORDER BY Amount DESC);
 
 SELECT c.* FROM Couriers c
 WHERE Weight > ALL (SELECT Weight FROM Couriers WHERE SenderName = 'Shweta Reddy');
-
-

@@ -1,5 +1,4 @@
 --Task-1
-
 CREATE DATABASE CourierManagementSystem;
 USE CourierManagementSystem;
 

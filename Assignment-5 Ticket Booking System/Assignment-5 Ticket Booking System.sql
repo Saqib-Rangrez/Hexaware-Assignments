@@ -3,7 +3,6 @@ CREATE DATABASE TicketBookingSystem;
 USE TicketBookingSystem;
 
 
-
 CREATE TABLE Venu (
     venue_id INT PRIMARY KEY,
     venue_name VARCHAR(255),

@@ -2,7 +2,6 @@
 	CREATE DATABASE TechShop;
 	USE TechShop;
 
-
 	CREATE TABLE Customers
 	( CustomerID INT PRIMARY KEY not null,
 	FirstName varchar(30) not null,
@@ -182,6 +181,7 @@ SELECT*FROM Orders;
 
 --Task-3
 
+
 SELECT O.OrderID,O.CustomerID,O.OrderDate,O.TotalAmount,C.FirstName,C.LastName,C.NumberOfOrdersPlaced
 FROM Orders O
 JOIN Customers C ON C.CustomerID=O.CustomerID;
@@ -233,7 +233,6 @@ ORDER BY OrderCount DESC;
 
 DECLARE @ProductName varchar(100)
 SET @ProductName='Gaming Console'
-
 SELECT C.FirstName,C.LastName,P.ProductName,O.OrderID,P.ProductID
 FROM Customers C
 JOIN Orders O ON O.CustomerID=C.CustomerID
@@ -254,67 +253,112 @@ WHERE OrderDate >=@StartDate AND OrderDate<=@EndDate;
 
 --Task-4
 
-SELECT C.CustomerID,C.FirstName,O.OrderID
-FROM Customers C
-LEFT JOIN Orders O
-ON O.OrderID=C.CustomerID
-WHERE NumberOfOrdersPlaced=0;
 
-
-SELECT SUM(QuantityInStock) AS ProductsAvailable
-FROM Inventory;
-
-
-SELECT SUM(TotalAmount*Quantity) AS RevenueGenerated
-FROM Orders O
-JOIN OrderDetails OD
-ON OD.OrderID=O.OrderID;
-
-
-DECLARE @ProductCategory varchar(20);
-SET @ProductCategory ='Laptop Pro';
-SELECT P.ProductName,P.ProductID,AVG(OD.Quantity) AS AverageQuantityOrdered
-FROM OrderDetails OD
-JOIN Products P ON P.ProductID=OD.ProductID
-WHERE P.ProductName=@ProductCategory
-GROUP BY P.ProductID,P.ProductName;
-
-
-DECLARE @CustomerID int
-SET @CustomerID='3';
-SELECT C.CustomerID, SUM(O.TotalAmount*OD.Quantity) AS RevenueByCustomer
-FROM Orders O
-JOIN OrderDetails OD ON OD.OrderID=O.OrderID
-JOIN Customers C ON C.CustomerID=O.CustomerID
-WHERE C.CustomerID=@CustomerID
-GROUP BY C.CustomerID;
-
-
-SELECT FirstName,LastName,COUNT(NumberOfOrdersPlaced) AS OrdersPlaced
+SELECT CustomerID, FirstName, LastName
 FROM Customers
-GROUP BY FirstName,LastName
-ORDER BY OrdersPlaced DESC;
+WHERE CustomerID NOT IN (SELECT DISTINCT CustomerID FROM Orders);
 
 
-SELECT TOP 1 P.ProductID,P.ProductName,SUM(OD.Quantity) AS NumberOfOrders
-FROM Products P
-JOIN OrderDetails OD ON OD.ProductID=P.ProductID
-GROUP BY P.ProductID,P.ProductName
-ORDER BY NumberOfOrders DESC;
+SELECT
+    (SELECT COUNT(*) FROM Products) AS TotalProductsAvailableForSale;
 
 
-SELECT TOP 1 C.CustomerID,C.FirstName,C.LastName,SUM(O.TotalAmount*OD.Quantity) AS MoneySpent
-FROM Customers C
-JOIN Orders O ON O.CustomerID=C.CustomerID
-JOIN OrderDetails OD ON OD.OrderID=O.OrderID
-GROUP BY C.CustomerID,C.FirstName,C.LastName;
+SELECT SUM(RevenueGenerated) AS TotalRevenue
+FROM (
+    SELECT O.TotalAmount * OD.Quantity AS RevenueGenerated
+    FROM Orders O
+    JOIN OrderDetails OD ON OD.OrderID = O.OrderID) AS TotalRevenue;
 
 
-SELECT AVG(TotalAmount) AS AverageOrderValue
-FROM Orders;
+DECLARE @CategoryName VARCHAR(30);
+SET @CategoryName = 'Smart TV';
+SELECT AVG(od.Quantity) AS AverageQuantityOrdered
+FROM OrderDetails od
+JOIN Products p ON od.ProductID = p.ProductID
+WHERE p.ProductID IN (
+    SELECT ProductID
+    FROM Products
+    WHERE ProductName = @CategoryName
+);
 
 
-SELECT C.CustomerID,C.FirstName,C.LastName,COUNT(O.OrderID) AS OrderCount
-FROM Customers C
-JOIN Orders O ON O.CustomerID=C.CustomerID
-GROUP BY C.CustomerID,C.FirstName,C.LastName;
+SELECT*FROM Customers;
+DECLARE @CustomerID INT;
+SET @CustomerID = 6;
+SELECT c.CustomerID, c.FirstName, c.LastName, SUM(od.Quantity * p.Price) AS TotalRevenue
+FROM
+    Customers c
+INNER JOIN
+    Orders o ON c.CustomerID = o.CustomerID
+INNER JOIN
+    OrderDetails od ON o.OrderID = od.OrderID
+INNER JOIN
+    Products p ON od.ProductID = p.ProductID
+WHERE
+    c.CustomerID = @CustomerID
+GROUP BY
+    c.CustomerID, c.FirstName, c.LastName;
+
+
+
+SELECT TOP 1
+    Customers.CustomerID,
+    FirstName,
+    LastName,
+    OrderCount
+FROM (
+    SELECT
+        CustomerID,
+        COUNT(*) AS OrderCount
+    FROM Orders
+    GROUP BY CustomerID
+) AS CustomerOrders
+JOIN Customers ON CustomerOrders.CustomerID = Customers.CustomerID
+ORDER BY OrderCount DESC;
+
+
+SELECT TOP 1
+    CategoryName,
+    TotalQuantityOrdered
+FROM (
+    SELECT
+        Products.ProductName AS CategoryName,
+        SUM(OrderDetails.Quantity) AS TotalQuantityOrdered
+    FROM OrderDetails
+    JOIN Products ON OrderDetails.ProductID = Products.ProductID
+    GROUP BY Products.ProductName
+) AS CategoryTotals
+ORDER BY TotalQuantityOrdered DESC;
+
+
+SELECT TOP 1
+    Customers.CustomerID,
+    FirstName,
+    LastName,
+    (
+        SELECT SUM(OrderDetails.Quantity * Products.Price)
+        FROM Orders
+        JOIN OrderDetails ON Orders.OrderID = OrderDetails.OrderID
+        JOIN Products ON OrderDetails.ProductID = Products.ProductID
+        WHERE Orders.CustomerID = Customers.CustomerID
+    ) AS TotalSpending
+FROM Customers
+ORDER BY TotalSpending DESC;
+
+
+SELECT
+    CustomerID,
+    FirstName,
+    LastName,
+    (
+        SELECT AVG(TotalAmount)
+        FROM Orders
+        WHERE Orders.CustomerID = Customers.CustomerID
+    ) AS AverageOrderValue
+FROM Customers;
+
+
+SELECT CustomerID, FirstName, LastName,
+(SELECT COUNT(*) FROM Orders WHERE Orders.CustomerID = Customers.CustomerID) AS OrderCount
+FROM Customers;
+
